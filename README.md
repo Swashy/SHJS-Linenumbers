@@ -14,4 +14,5 @@ Licens
 ------
 
 Distributed under the GNU General Public License version 3
-[http://shjs.sourceforge.net/doc/gplv3.html]
+
+[http://shjs.sourceforge.net/doc/gplv3.html](http://shjs.sourceforge.net/doc/gplv3.html)
