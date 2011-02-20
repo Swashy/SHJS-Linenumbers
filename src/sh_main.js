@@ -453,6 +453,8 @@ function sh_insertTags(tags, text) {
 
 /**
  * Add linenumbers
+ * Wraps a table around the pre tag, including linenumbers left of the code
+ * Make mark and copy easy without accidentally copiyng all the linenumbers
  *
  * @param element, the pre element including the highlighted code
  * @param lines, the number of code lines (calculated in sh_highlightString())
@@ -461,13 +463,13 @@ function sh_insertTags(tags, text) {
 function sh_lineNumbers(element, lines) {
   //create wrap elements
   var lineWrap = document.createElement('td');
-  lineWrap.setAttribute('class', 'ln');
+  lineWrap.setAttribute('class', 'sh_ln');
   var lineNumbers = document.createElement('div');
-  lineNumbers.setAttribute('class','linenum'); //add class for css styling
+  lineNumbers.setAttribute('class','sh_linenum'); //add class for css styling
   var tr = document.createElement('tr');
   var codeWrap = document.createElement('td');
   var codeTable = document.createElement('table');
-  codeTable.setAttribute('class', 'sh_sourceCode_table'); //add class for css styling
+  codeTable.setAttribute('class', 'sh_Codetable'); //add class for css styling
   
   //add line numbers  
   for(var i = 1; i <= lines; i++) {
@@ -495,7 +497,8 @@ function sh_highlightElement(element, language) {
   sh_addClass(element, 'sh_sourceCode');
   var originalTags = [];
   var inputString = sh_extractTags(element, originalTags);
-  var highlightTags = sh_highlightString(inputString, language)[0];
+  var highligtedStrings = sh_highlightString(inputString, language);
+  var highlightTags = highligtedStrings[0];
   var tags = sh_mergeTags(originalTags, highlightTags);
   var documentFragment = sh_insertTags(tags, inputString);
   while (element.hasChildNodes()) {
@@ -503,7 +506,7 @@ function sh_highlightElement(element, language) {
   }
   element.appendChild(documentFragment);
   
-  sh_lineNumbers(element, sh_highlightString(inputString, language)[1]);
+  sh_lineNumbers(element, highligtedStrings[1]);
 }
 
 function sh_getXMLHttpRequest() {
