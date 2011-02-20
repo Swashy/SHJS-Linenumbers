@@ -133,7 +133,9 @@ function sh_highlightString(inputString, language) {
   var endOfLinePattern = /\r\n|\r|\n/g;
   endOfLinePattern.lastIndex = 0;
   var inputStringLength = inputString.length;
+  var linenum = 0;
   while (pos < inputStringLength) {
+    linenum++;
     var start = pos;
     var end;
     var startOfNextLine;
@@ -246,8 +248,13 @@ function sh_highlightString(inputString, language) {
     }
     pos = startOfNextLine;
   }
+  
+  //return an array including the tags, and number of lines
+  var stringsnum = new Array()
+  stringsnum[0] = tags;
+  stringsnum[1] = linenum;  
 
-  return tags;
+  return stringsnum;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -445,6 +452,40 @@ function sh_insertTags(tags, text) {
 }
 
 /**
+ * Add linenumbers
+ *
+ * @param element, the pre element including the highlighted code
+ * @param lines, the number of code lines (calculated in sh_highlightString())
+ * @see sh_highlightString
+ */
+function sh_lineNumbers(element, lines) {
+  //create wrap elements
+  var lineWrap = document.createElement('td');
+  lineWrap.setAttribute('class', 'ln');
+  var lineNumbers = document.createElement('div');
+  lineNumbers.setAttribute('class','linenum'); //add class for css styling
+  var tr = document.createElement('tr');
+  var codeWrap = document.createElement('td');
+  var codeTable = document.createElement('table');
+  codeTable.setAttribute('class', 'sh_sourceCode_table'); //add class for css styling
+  
+  //add line numbers  
+  for(var i = 1; i <= lines; i++) {
+    lineNumbers.innerHTML = lineNumbers.innerHTML + "<span>" + i + "</span>\n";
+  }
+  
+  //wrap each element appropriately
+  lineWrap.appendChild(lineNumbers);
+  tr.appendChild(lineWrap);  
+  codeWrap.appendChild(element.cloneNode(true));  
+  tr.appendChild(codeWrap);  
+  codeTable.appendChild(tr);
+  
+  //replace element with the new table code structure
+  element.parentNode.replaceChild(codeTable, element);
+}
+
+/**
 Highlights an element containing source code.  Upon completion of this function,
 the element will have been placed in the "sh_sourceCode" class.
 @param  element  a DOM <pre> element containing the source code to be highlighted
@@ -454,13 +495,15 @@ function sh_highlightElement(element, language) {
   sh_addClass(element, 'sh_sourceCode');
   var originalTags = [];
   var inputString = sh_extractTags(element, originalTags);
-  var highlightTags = sh_highlightString(inputString, language);
+  var highlightTags = sh_highlightString(inputString, language)[0];
   var tags = sh_mergeTags(originalTags, highlightTags);
   var documentFragment = sh_insertTags(tags, inputString);
   while (element.hasChildNodes()) {
     element.removeChild(element.firstChild);
   }
   element.appendChild(documentFragment);
+  
+  sh_lineNumbers(element, sh_highlightString(inputString, language)[1]);
 }
 
 function sh_getXMLHttpRequest() {
@@ -532,7 +575,7 @@ function sh_highlightDocument(prefix, suffix) {
           throw 'Found <pre> element with class="' + htmlClass + '", but no such language exists';
         }
         break;
-      }
+      }      
     }
   }
 }
