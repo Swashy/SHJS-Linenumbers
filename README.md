@@ -6,7 +6,7 @@ Adding linenumbers to SHJS syntaxt highlighter
 Usage
 -----
 
-just grab `src/sh_main.js` and make sure to have a the right css classes styled, look at `src/sh_style.css`
+just grab `src/sh_main.js` and make sure to have the right css classes styled, look at `src/sh_style.css`
 
 You can also check out the example `example/example.html`
 
